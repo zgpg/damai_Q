@@ -124,7 +124,7 @@ class App:
 
 
 if __name__ == '__main__':
-    print('版本1.2.1')
+    print('版本1.0')
 
     myapp = App()
     myapp.login()
