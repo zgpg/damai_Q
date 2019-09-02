@@ -117,8 +117,8 @@ class App:
             #2个票需要选择2个身份证
             self.driver.find_element_by_xpath(
                 '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[1]/input').click()
-            #self.driver.find_element_by_xpath(
-            #    '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div[2]/label/span[1]/input').click()
+            self.driver.find_element_by_xpath(
+                '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div[2]/label/span[1]/input').click()
         except Exception as e:
             print('购票人选择出错', e)
 
