@@ -1,6 +1,5 @@
 # damai_Q
-基于Python和Selenium实现的抢票脚本——
-感谢 @damaiTi9 ，本人也是data粉，此代码根据damaiTi9修改而来
+基于Python和Selenium实现的抢票脚本
 
 ## 依赖
 Python3.6+ 和 Chrome浏览器
