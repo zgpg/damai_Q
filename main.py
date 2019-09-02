@@ -55,7 +55,7 @@ class App:
         print('选择票档')
         self.driver.find_element_by_xpath(f'//div[@class="perform__order__select perform__order__select__performs"]/following-sibling::div[2]/div[2]/div[1]/div[{self.grade}]').click()
         dbuy_button = self.driver.find_element_by_xpath('//div[@data-spm="dbuy"]')
-        #判断购买几张票
+        #判断购买几张票,一般大麦网需要抢购的演唱会一个帐号只能抢2张票
         if int(self.quantity) > 1:
             try:
                 self.driver.find_element_by_xpath(
