@@ -21,7 +21,6 @@ class App:
     phone = get_config('info', 'phone')
     round = get_config('model', 'round')
     quantity = get_config('model', 'quantity')
-    express = get_config('model', 'express')
     grade = get_config('model', 'grade')
     url = get_config('model', 'url')
     
@@ -55,11 +54,15 @@ class App:
         ticket_file = self.driver.find_element_by_xpath(f'//div[@class="perform__order__select perform__order__select__performs"]/following-sibling::div[2]/div[2]/div[1]/div[{self.grade}]')
         ticket_file.click()
 
-        #判断购买几张票,一般大麦网需要抢购的演唱会一个帐号只能抢2张票，点击一次就ok
+        #判断购买几张票
         if int(self.quantity) > 1:
             try:
-                time.sleep(0.1)
-                next = self.driver.find_element_by_xpath(f'//a[@class="cafe-c-input-number-handler cafe-c-input-number-handler-up"]').click()
+                print(self.quantity,"张票")
+                ticket_input = self.driver.find_element_by_xpath('//input[@class="cafe-c-input-number-input"]')
+                #ticket_input.click()
+                ticket_input.clear()
+                ticket_input.send_keys(self.quantity)
+                #self.driver.find_element_by_xpath('//a[@class="cafe-c-input-number-handler cafe-c-input-number-handler-up"]').click()
             except Exception as e:
                 print("未成功点击+号", e)
 
@@ -84,6 +87,7 @@ class App:
 
                 elif dbuy_button.text == "立即预订":
                     self.choose_tickets()
+                    #break
                     dbuy_button.click()
 
                 elif dbuy_button.text == "立即购买":
@@ -108,7 +112,7 @@ class App:
         while title != '确认订单':
             title = self.driver.title
         
-
+        print('开始选择购票人',self.quantity)
         try:
             #2个票需要选择2个身份证
             self.driver.find_element_by_xpath(
@@ -119,7 +123,7 @@ class App:
             print('购票人选择出错', e)
 
         print('success')
-        #self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
+        self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
 
 
 if __name__ == '__main__':
