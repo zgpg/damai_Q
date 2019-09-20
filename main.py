@@ -73,7 +73,11 @@ class App:
             print('寻找按钮:', dbuy_button.text)
             print("---开始进行日期及票价选择---")
             try:
-                if dbuy_button.text == "即将开售":
+                if dbuy_button.text == "即将开抢":
+                    print('---抢票未开始，等待刷新开始---')
+                    continue
+
+                elif dbuy_button.text == "即将开售":
                     print('---抢票未开始，等待刷新开始---')
                     continue
 
@@ -127,7 +131,7 @@ class App:
 
 
 if __name__ == '__main__':
-    print('版本1.1')
+    print('版本1.2')
 
     myapp = App()
     myapp.login()
