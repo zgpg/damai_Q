@@ -19,10 +19,10 @@ class App:
     #dotakey = get_config('info', 'privilege_val')
     name = get_config('info', 'name')
     phone = get_config('info', 'phone')
-    round = get_config('model', 'round')
-    quantity = get_config('model', 'quantity')
     grade = get_config('model', 'grade')
     url = get_config('model', 'url')
+    status = 0#状态,表示如今进行到何种程度
+    num = 0
     
     os_name = platform.system().lower()
     if 'windows' == os_name:
@@ -33,107 +33,121 @@ class App:
 
     def login(self):
         #登陆
-
         self.driver.get('https://passport.damai.cn/login')
 
         WebDriverWait(self.driver, 3000).until(
             EC.presence_of_element_located((By.XPATH, '//a[@data-spm="duserinfo"]/div')))
         print('登陆成功')
+        self.status = 1
         user_name = self.driver.find_element_by_xpath('//a[@data-spm="duserinfo"]/div').text
         print('账号：', user_name)
         self.driver.get(self.url)
         print('跳转抢票页面')
+        self.status = 2
 
-    def choose_tickets(self):
-        #选择场次和票档
-        print('选择场次')
-        c_session = self.driver.find_element_by_xpath(f'//div[@class="perform__order__select perform__order__select__performs"]/div[2]/div[1]/div[{self.round}]/span[2]')
-        c_session.click()
-        time.sleep(0.1)
-        print('选择票档')
-        ticket_file = self.driver.find_element_by_xpath(f'//div[@class="perform__order__select perform__order__select__performs"]/following-sibling::div[2]/div[2]/div[1]/div[{self.grade}]')
-        ticket_file.click()
-
-        #判断购买几张票
-        if int(self.quantity) > 1:
-            try:
-                print(self.quantity,"张票")
-                ticket_input = self.driver.find_element_by_xpath('//input[@class="cafe-c-input-number-input"]')
-                #ticket_input.click()
-                ticket_input.clear()
-                ticket_input.send_keys(self.quantity)
-                #self.driver.find_element_by_xpath('//a[@class="cafe-c-input-number-handler cafe-c-input-number-handler-up"]').click()
-            except Exception as e:
-                print("未成功点击+号", e)
 
     def detail_page_auto(self):
+        if(self.status == 2):
         
-        while self.driver.title != '确认订单':
-            dbuy_button = self.driver.find_element_by_xpath('//div[@data-spm="dbuy"]')
-            print('寻找按钮:', dbuy_button.text)
-            print("---开始进行日期及票价选择---")
-            try:
-                if dbuy_button.text == "即将开抢":
-                    print('---抢票未开始，等待刷新开始---')
-                    continue
+            self.num=1#第一次尝试
+            time_start=time.time()
 
-                elif dbuy_button.text == "即将开售":
-                    print('---抢票未开始，等待刷新开始---')
-                    continue
+            while self.driver.title != '确认订单':
+                if self.num!=1:#如果前一次失败了，那就刷新界面重新开始
+                    self.status=2
+                    print(self.num,"次失败，重新选择")
+                    self.driver.get(self.url)
 
-                elif dbuy_button.text == "开售提醒":
-                    print('还不到抢票时间，开售提醒')
-                    break
+                try:    
+                    element = WebDriverWait(self.driver, 3).until(EC.presence_of_element_located((By.XPATH, '//div[@class="perform__order__select perform__order__select__performs"]/following-sibling::div[2]/div[2]/div[1]')))
+                except Exception as e:
+                    print(e)
+                pricelist=element.find_elements_by_xpath('div')
+                print("开始选择票档")
+                gradeList = self.grade.split(',')
+                gradeNum = 0
+                for i in gradeList:
+                    gradeNum+=1
+                    print(i,pricelist[int(i)-1].text)
+                    try:
+                        j=pricelist[int(i)-1].find_element_by_xpath('span').text
+                        print(j)
+                        continue
+                    except Exception as e:
+                        print("有可以选择的票档了"+pricelist[int(i)-1].text)
+                        pricelist[int(i)-1].click()
+                        time.sleep(0.1)
+                        break
+                print(gradeNum,len(gradeList))
+                if(gradeNum == len(gradeList)):
+                    self.num+=1
+                    print("都没有票了，我再刷新页面试一下")
+                    print(self.num,"次失败，重新选择")
+                    self.driver.get(self.url)
+                dbuy_button = self.driver.find_element_by_xpath('//div[@data-spm="dbuy"]')
+                print('寻找按钮:', dbuy_button.text)
+                print("---开始进行日期及票价选择---")
+                try:
+                    if dbuy_button.text == "即将开抢":
+                        print('---抢票未开始，等待刷新开始---')
+                        continue
 
-                elif dbuy_button.text == "立即预定":
-                    self.choose_tickets()
-                    dbuy_button.click()
+                    elif dbuy_button.text == "即将开售":
+                        print('---抢票未开始，等待刷新开始---')
+                        continue
 
-                elif dbuy_button.text == "立即预订":
-                    self.choose_tickets()
-                    #break
-                    dbuy_button.click()
+                    elif dbuy_button.text == "开售提醒":
+                        print('还不到抢票时间，开售提醒')
+                        break
+                    elif dbuy_button.text == "立即预定":
+                        self.status = 3
+                        dbuy_button.click()
 
-                elif dbuy_button.text == "立即购买":
-                    self.choose_tickets()
-                    dbuy_button.click()
+                    elif dbuy_button.text == "立即预订":
+                        self.status = 3
+                        dbuy_button.click()
 
-                elif dbuy_button.text == "提交缺货登记":
-                    print('---抢票失败，请手动提交缺货登记---')  
-                    break
+                    elif dbuy_button.text == "立即购买":
+                        self.status = 3
+                        dbuy_button.click()
 
-                else:
-                    dbuy_button.click()
+                    elif dbuy_button.text == "提交缺货登记":
+                        print('---抢票失败，请手动提交缺货登记---')  
+                        break
+                    else:
+                        dbuy_button.click()
 
-            except Exception as ex:
-                print('---未跳转到订单结算界面---',ex)
-                
+                except Exception as ex:
+                    print('---未跳转到订单结算界面---',ex)
+                self.num+=1
     def confirm_auto(self):
         #确认订单
-
-        print('开始确认订单')
-        title = self.driver.title
-        while title != '确认订单':
+        if(self.status == 3):
+            print('开始确认订单')
             title = self.driver.title
-        
-        print('开始选择购票人',self.quantity)
-        try:
-            #2个票需要选择2个身份证
-            self.driver.find_element_by_xpath(
-                '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[1]/input').click()
-            self.driver.find_element_by_xpath(
-                '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div[2]/label/span[1]/input').click()
-        except Exception as e:
-            print('购票人选择出错', e)
-
-        print('success')
-        self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
+            while title != '确认订单':
+                title = self.driver.title
+            
+            print('success')
+            #self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
 
 
 if __name__ == '__main__':
-    print('版本1.2')
+    print('版本1.3')
 
+    now = int(time.time())
+    go_time = get_config('model', 'date')
+    timeArray = time.strptime(go_time, "%Y-%m-%d %H:%M:%S")
+    go_timeint = int(time.mktime(timeArray))
+    time_left = go_timeint-now
     myapp = App()
     myapp.login()
-    myapp.detail_page_auto()
-    myapp.confirm_auto()
+    while time_left > 0:
+        print('倒计时(s):',time_left)
+        time.sleep(1)
+        time_left = time_left - 1
+        if(time_left == 5):
+            print("开始执行抢票程序")
+            myapp.detail_page_auto()
+            myapp.confirm_auto()
+            break
