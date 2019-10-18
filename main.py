@@ -76,9 +76,9 @@ class App:
                     except Exception as e:
                         print("有可以选择的票档了"+pricelist[int(i)-1].text)
                         pricelist[int(i)-1].click()
-                        time.sleep(0.1)
+                        #time.sleep(0.1)
                         break
-                print(gradeNum,len(gradeList))
+                #print(gradeNum,len(gradeList))
                 if(gradeNum == len(gradeList)):
                     self.num+=1
                     print("都没有票了，我再刷新页面试一下")
@@ -127,9 +127,20 @@ class App:
             title = self.driver.title
             while title != '确认订单':
                 title = self.driver.title
+
+            print('开始选择购票人')                  
+            try:    
+            #2个票需要选择2个身份证               
+                self.driver.find_element_by_xpath(
+                    '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[1]/input').click() 
+                #self.driver.find_element_by_xpath(
+                #    '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[2]/input').click()   
+              
+            except Exception as e:  
+                print('购票人选择出错', e)
             
             print('success')
-            #self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
+            self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
 
 
 if __name__ == '__main__':
