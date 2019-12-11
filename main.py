@@ -71,7 +71,7 @@ class App:
                     print(i,pricelist[int(i)-1].text)
                     try:
                         j=pricelist[int(i)-1].find_element_by_xpath('span').text
-                        print(j)
+                        #print(j)
                         continue
                     except Exception as e:
                         print("有可以选择的票档了"+pricelist[int(i)-1].text)
@@ -133,8 +133,6 @@ class App:
             #2个票需要选择2个身份证               
                 self.driver.find_element_by_xpath(
                     '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[1]/input').click() 
-                #self.driver.find_element_by_xpath(
-                #    '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[2]/input').click()   
               
             except Exception as e:  
                 print('购票人选择出错', e)
@@ -157,7 +155,7 @@ if __name__ == '__main__':
         print('倒计时(s):',time_left)
         time.sleep(1)
         time_left = time_left - 1
-        if(time_left == 5):
+        if(time_left == 12):
             print("开始执行抢票程序")
             myapp.detail_page_auto()
             myapp.confirm_auto()
