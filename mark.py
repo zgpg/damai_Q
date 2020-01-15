@@ -33,14 +33,14 @@ class App:
 
     def login(self):
         #登陆
-        #self.driver.get('https://passport.damai.cn/login')
-#
-        #WebDriverWait(self.driver, 3000).until(
-        #    EC.presence_of_element_located((By.XPATH, '//a[@data-spm="duserinfo"]/div')))
-        #print('登陆成功')
-        #self.status = 1
-        #user_name = self.driver.find_element_by_xpath('//a[@data-spm="duserinfo"]/div').text
-        #print('账号：', user_name)
+        self.driver.get('https://passport.damai.cn/login')
+
+        WebDriverWait(self.driver, 3000).until(
+            EC.presence_of_element_located((By.XPATH, '//a[@data-spm="duserinfo"]/div')))
+        print('登陆成功')
+        self.status = 1
+        user_name = self.driver.find_element_by_xpath('//a[@data-spm="duserinfo"]/div').text
+        print('账号：', user_name)
         self.driver.get(self.url)
         print('跳转抢票页面')
         self.status = 2
@@ -138,7 +138,7 @@ class App:
                 print('购票人选择出错', e)
             
             print('success')
-            #self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
+            self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
 
 
 if __name__ == '__main__':

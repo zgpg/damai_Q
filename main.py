@@ -35,8 +35,7 @@ class App:
         #登陆
         self.driver.get('https://passport.damai.cn/login')
 
-        WebDriverWait(self.driver, 3000).until(
-            EC.presence_of_element_located((By.XPATH, '//a[@data-spm="duserinfo"]/div')))
+        WebDriverWait(self.driver, 3000).until(EC.presence_of_element_located((By.XPATH, '//a[@data-spm="duserinfo"]/div')))
         print('登陆成功')
         self.status = 1
         user_name = self.driver.find_element_by_xpath('//a[@data-spm="duserinfo"]/div').text
@@ -69,14 +68,12 @@ class App:
                 for i in gradeList:
                     gradeNum+=1
                     print(i,pricelist[int(i)-1].text)
-                    try:
-                        j=pricelist[int(i)-1].find_element_by_xpath('span').text
-                        #print(j)
+                    ishave = App.isElementExist(pricelist[int(i)-1],'span')
+                    if ishave:
                         continue
-                    except Exception as e:
+                    else:
                         print("有可以选择的票档了"+pricelist[int(i)-1].text)
                         pricelist[int(i)-1].click()
-                        #time.sleep(0.1)
                         break
                 #print(gradeNum,len(gradeList))
                 if(gradeNum == len(gradeList)):
@@ -110,10 +107,11 @@ class App:
                     elif dbuy_button.text == "立即购买":
                         self.status = 3
                         dbuy_button.click()
-
                     elif dbuy_button.text == "提交缺货登记":
-                        print('---抢票失败，请手动提交缺货登记---')  
-                        break
+                        self.num+=1
+                        print("都没有票了，我再刷新页面试一下")
+                        print(self.num,"次失败，重新选择")
+                        self.driver.get(self.url)
                     else:
                         dbuy_button.click()
 
@@ -134,15 +132,23 @@ class App:
                 self.driver.find_element_by_xpath(
                     '//*[@id="confirmOrder_1"]/div[2]/div[2]/div[1]/div/label/span[1]/input').click() 
               
-            except Exception as e:  
+            except Exception as e: 
                 print('购票人选择出错', e)
+                self.driver.get(self.url)
             
             print('success')
-            self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
-
+            #self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
+    def isElementExist(browser,element):
+        flag=True
+        try:
+            browser.find_element_by_xpath(element)
+            return flag
+        except:
+            flag=False
+            return flag
 
 if __name__ == '__main__':
-    print('版本1.3')
+    print('版本1.4')
 
     now = int(time.time())
     go_time = get_config('model', 'date')
@@ -160,3 +166,7 @@ if __name__ == '__main__':
             myapp.detail_page_auto()
             myapp.confirm_auto()
             break
+    else:
+        myapp.detail_page_auto()
+        myapp.confirm_auto()
+        print('done!')
