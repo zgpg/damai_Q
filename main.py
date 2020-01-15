@@ -137,7 +137,7 @@ class App:
                 self.driver.get(self.url)
             
             print('success')
-            #self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
+            self.driver.find_element_by_xpath('//div[@class="submit-wrapper"]/button').click()
     def isElementExist(browser,element):
         flag=True
         try:
